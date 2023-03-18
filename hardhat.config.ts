@@ -1,12 +1,12 @@
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
-import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
-
 import 'solidity-coverage'
 
 import * as fs from 'fs'
+
+import { HardhatUserConfig } from 'hardhat/config'
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
@@ -38,7 +38,7 @@ const optimizedComilerSettings = {
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [{
-      version: '0.8.15',
+      version: '0.8.19',
       settings: {
         optimizer: { enabled: true, runs: 1000000 }
       }
@@ -50,6 +50,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     dev: { url: 'http://localhost:8545' },
+    localhost: getNetwork1('http://localhost:8545'),
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' },
     goerli: getNetwork('goerli'),
