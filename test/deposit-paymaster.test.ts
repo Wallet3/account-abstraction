@@ -1,24 +1,32 @@
 import './aa.init'
-import { ethers } from 'hardhat'
-import { expect } from 'chai'
+
 import {
-  SimpleAccount,
-  EntryPoint,
+  AddressZero,
+  FIVE_ETH,
+  ONE_ETH,
+  createAccount,
+  createAccountOwner,
+  createAddress,
+  deployEntryPoint,
+  simulationResultCatch,
+  userOpsWithoutAgg
+} from './testutils'
+import {
   DepositPaymaster,
   DepositPaymaster__factory,
-  TestOracle__factory,
+  EntryPoint,
+  SimpleAccount,
   TestCounter,
   TestCounter__factory,
+  TestOracle__factory,
   TestToken,
   TestToken__factory
 } from '../typechain'
-import {
-  AddressZero, createAddress,
-  createAccountOwner,
-  deployEntryPoint, FIVE_ETH, ONE_ETH, simulationResultCatch, userOpsWithoutAgg, createAccount
-} from './testutils'
-import { fillAndSign } from './UserOp'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
+
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
+import { fillAndSign } from './UserOp'
 
 describe('DepositPaymaster', () => {
   let entryPoint: EntryPoint
@@ -62,7 +70,7 @@ describe('DepositPaymaster', () => {
       const paymasterWithdraw = await paymaster.populateTransaction.withdrawTokensTo(token.address, AddressZero, 1).then(tx => tx.data!)
 
       await expect(
-        account.executeBatch([paymaster.address, paymaster.address], [paymasterUnlock, paymasterWithdraw])
+        account.executeBatch([paymaster.address, paymaster.address], [0, 0], [paymasterUnlock, paymasterWithdraw])
       ).to.be.revertedWith('DepositPaymaster: must unlockTokenDeposit')
     })
     it('should succeed to withdraw after unlock', async () => {
