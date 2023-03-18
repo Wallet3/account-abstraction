@@ -8,7 +8,7 @@ pragma solidity ^0.8.12;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
-
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "../core/BaseAccount.sol";
 
 /**
@@ -17,8 +17,10 @@ import "../core/BaseAccount.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable {
+contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable, IERC1271 {
     using ECDSA for bytes32;
+    
+    bytes4 internal constant ERC1271_MAGIC_VALUE = 0x1626ba7e;
 
     //filler member, to push the nonce and owner to the same slot
     // the "Initializeble" class takes 2 bytes in the first slot
@@ -74,8 +76,7 @@ contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable {
      */
     function executeBatch(address[] calldata dest, uint256[] calldata values, bytes[] calldata func) external {
         _requireFromEntryPointOrOwner();
-        require(dest.length == func.length, "wrong array lengths");
-        require(values.length == dest.length, "wrong array lengths");
+        require(dest.length == func.length && values.length == dest.length, "wrong array lengths");
         
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], values[i], func[i]);
@@ -150,6 +151,21 @@ contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable {
     function _authorizeUpgrade(address newImplementation) internal view override {
         (newImplementation);
         _onlyOwner();
+    }
+
+    function isValidSignature(
+        bytes32 _hash,
+        bytes memory _signature
+    ) external override view returns (bytes4) {
+        bytes32 hash = _hash.toEthSignedMessageHash();
+        address recovered = hash.recover(_signature);
+
+        // Validate signatures
+        if (recovered == owner) {
+            return ERC1271_MAGIC_VALUE;
+        } else {
+            return 0xffffffff;
+        }
     }
 }
 
