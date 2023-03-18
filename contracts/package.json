@@ -1,5 +1,5 @@
 {
-  "name": "@account-abstraction/contracts",
+  "name": "@wallet3/account-abstraction-contracts",
   "description": "Account Abstraction (EIP 4337) contracts",
   "version": "0.5.0",
   "main": "./dist/index.js",
@@ -16,7 +16,7 @@
     "ethereum",
     "smart",
     "contracts",
-    "accipt-abstraction",
+    "account-abstraction",
     "eip-4337"
   ],
   "license": "MIT",
