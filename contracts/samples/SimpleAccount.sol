@@ -72,11 +72,13 @@ contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable {
     /**
      * execute a sequence of transactions
      */
-    function executeBatch(address[] calldata dest, bytes[] calldata func) external {
+    function executeBatch(address[] calldata dest, uint256[] calldata values, bytes[] calldata func) external {
         _requireFromEntryPointOrOwner();
         require(dest.length == func.length, "wrong array lengths");
+        require(values.length == dest.length, "wrong array lengths");
+        
         for (uint256 i = 0; i < dest.length; i++) {
-            _call(dest[i], 0, func[i]);
+            _call(dest[i], values[i], func[i]);
         }
     }
 
