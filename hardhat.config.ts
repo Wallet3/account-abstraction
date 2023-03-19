@@ -9,19 +9,18 @@ import * as fs from 'fs'
 import { HardhatUserConfig } from 'hardhat/config'
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
-let mnemonic = 'test '.repeat(11) + 'junk'
+let mnemonic = `${'test '.repeat(11)}junk`
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
 
-function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork (url: string): { url: string, accounts: { mnemonic: string } } {
   return {
     url,
     accounts: { mnemonic }
   }
 }
 
-function getNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
-  return getNetwork1(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
-  // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
+function getInfuraNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
+  return getNetwork(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
 }
 
 const optimizedComilerSettings = {
@@ -44,18 +43,16 @@ const config: HardhatUserConfig = {
       }
     }],
     overrides: {
-      'contracts/core/EntryPoint.sol': optimizedComilerSettings,
-      'contracts/samples/SimpleAccount.sol': optimizedComilerSettings
+      'contracts/core/EntryPoint.sol': optimizedComilerSettings
     }
   },
   networks: {
     dev: { url: 'http://localhost:8545' },
-    localhost: getNetwork1('http://localhost:8545'),
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' },
-    goerli: getNetwork('goerli'),
-    sepolia: getNetwork('sepolia'),
-    proxy: getNetwork1('http://localhost:8545')
+    goerli: getInfuraNetwork('goerli'),
+    sepolia: getInfuraNetwork('sepolia'),
+    proxy: getNetwork('http://localhost:8545')
   },
   mocha: {
     timeout: 10000
