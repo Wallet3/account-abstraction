@@ -1,6 +1,6 @@
 {
-  "name": "accountabstraction",
-  "version": "0.5.0",
+  "name": "@wallet3/account-abstraction",
+  "version": "0.5.1",
   "description": "",
   "scripts": {
     "clean": "rm -rf cache artifacts typechain typechain-types",
