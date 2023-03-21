@@ -51,6 +51,7 @@ const config: HardhatUserConfig = {
     goerli: getInfuraNetwork('goerli'),
     sepolia: getInfuraNetwork('sepolia'),
     baseGoerli: getNetwork(Chains.BaseGoerli),
+    mumbai: getNetwork(Chains.Mumbai),
     proxy: getNetwork('http://localhost:8545'),
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' }
