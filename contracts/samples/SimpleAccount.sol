@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "../core/BaseAccount.sol";
+import "./callback/TokenCallbackHandler.sol";
 
 /**
   * minimal account.
@@ -18,7 +19,7 @@ import "../core/BaseAccount.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable, IERC1271 {
+contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, Initializable, IERC1271 {
     using ECDSA for bytes32;
     
     bytes4 internal constant ERC1271_MAGIC_VALUE = 0x1626ba7e;
