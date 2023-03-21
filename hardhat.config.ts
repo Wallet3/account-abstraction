@@ -6,20 +6,20 @@ import 'solidity-coverage'
 
 import * as fs from 'fs'
 
+import Chains from './networks.config'
 import { HardhatUserConfig } from 'hardhat/config'
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = `${'test '.repeat(11)}junk`
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
 
-function getNetwork (url: string): { url: string, accounts: { mnemonic: string } } {
-  return {
-    url,
-    accounts: { mnemonic }
-  }
+interface Network { url: string, accounts: { mnemonic: string } }
+
+function getNetwork (url: string): Network {
+  return { url, accounts: { mnemonic } }
 }
 
-function getInfuraNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
+function getInfuraNetwork (name: string): Network {
   return getNetwork(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
 }
 
@@ -48,11 +48,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     dev: { url: 'http://localhost:8545' },
-    // github action starts localgeth service, for gas calculations
-    localgeth: { url: 'http://localgeth:8545' },
     goerli: getInfuraNetwork('goerli'),
     sepolia: getInfuraNetwork('sepolia'),
-    proxy: getNetwork('http://localhost:8545')
+    baseGoerli: getNetwork(Chains.BaseGoerli),
+    proxy: getNetwork('http://localhost:8545'),
+    // github action starts localgeth service, for gas calculations
+    localgeth: { url: 'http://localgeth:8545' }
   },
   mocha: {
     timeout: 10000

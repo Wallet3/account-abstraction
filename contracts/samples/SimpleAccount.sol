@@ -5,6 +5,7 @@ pragma solidity ^0.8.12;
 /* solhint-disable no-inline-assembly */
 /* solhint-disable reason-string */
 
+import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
@@ -81,6 +82,14 @@ contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable, IERC1271 
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], values[i], func[i]);
         }
+    }
+
+    /**
+     * deploy a contract
+     */
+    function executeContractDeployment(uint256 amount, bytes32 salt, bytes memory bytecode) external returns (address addr) {
+        _requireFromEntryPointOrOwner();
+        addr = Create2.deploy(amount, salt, bytecode);
     }
 
     /**
