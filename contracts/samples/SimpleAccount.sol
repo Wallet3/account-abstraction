@@ -24,12 +24,6 @@ contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, In
     
     bytes4 internal constant ERC1271_MAGIC_VALUE = 0x1626ba7e;
 
-    //filler member, to push the nonce and owner to the same slot
-    // the "Initializeble" class takes 2 bytes in the first slot
-    bytes28 private _filler;
-
-    //explicit sizes of nonce, to fit a single storage cell with "owner"
-    uint96 private _nonce;
     address public owner;
 
     IEntryPoint private immutable _entryPoint;
@@ -39,11 +33,6 @@ contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, In
     modifier onlyOwner() {
         _onlyOwner();
         _;
-    }
-
-    /// @inheritdoc BaseAccount
-    function nonce() public view virtual override returns (uint256) {
-        return _nonce;
     }
 
     /// @inheritdoc BaseAccount
@@ -110,11 +99,6 @@ contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, In
     // Require the function call went through EntryPoint or owner
     function _requireFromEntryPointOrOwner() internal view {
         require(msg.sender == address(entryPoint()) || msg.sender == owner, "account: not Owner or EntryPoint");
-    }
-
-    /// implement template method of BaseAccount
-    function _validateAndUpdateNonce(UserOperation calldata userOp) internal override {
-        require(_nonce++ == userOp.nonce, "account: invalid nonce");
     }
 
     /// implement template method of BaseAccount
