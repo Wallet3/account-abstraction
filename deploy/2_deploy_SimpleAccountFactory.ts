@@ -1,15 +1,11 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { ethers } from 'hardhat'
 
 const deploySimpleAccountFactory: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = ethers.provider
   const from = await provider.getSigner().getAddress()
   const network = await provider.getNetwork()
-  // only deploy on local test network.
-  if (network.chainId !== 31337 && network.chainId !== 1337) {
-    return
-  }
 
   const entrypoint = await hre.deployments.get('EntryPoint')
   const ret = await hre.deployments.deploy(
@@ -20,7 +16,8 @@ const deploySimpleAccountFactory: DeployFunction = async function (hre: HardhatR
       log: true,
       deterministicDeployment: true
     })
-  console.log('==SimpleAccountFactory addr=', ret.address)
+
+  console.log(`${network.name} ==SimpleAccountFactory addr=`, ret.address)
 }
 
 export default deploySimpleAccountFactory
